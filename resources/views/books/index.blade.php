@@ -37,4 +37,9 @@
             @endforeach
         </tbody>
     </table>
+
+    <!-- Pagination Links (Idinagdag dito sa ilalim ng table) -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ $books->links() }}
+    </div>
 </div>

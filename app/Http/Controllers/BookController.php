@@ -5,93 +5,74 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
-use Illuminate\Support\Facades\Log;
 
 class BookController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        abort(500);
-        
-        $books = Book::with('genre')->get();
+        $query = Book::with('genre');
+
+        // Optional: Kung may filter sa genre o search
+        if ($request->has('genre') && !empty($request->genre)) {
+            $query->where('genre_id', $request->genre);
+        }
+
+        // Pinalitan mula get() patungong paginate(5) para gumana ang pagination sa Pahina 1, 2, atbp.
+        $books = $query->paginate(5);
+
         return view('books.index', compact('books'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function featured()
+    {
+        $books = Book::all();
+        return view('books.featured', compact('books'));
+    }
+
+    public function show($id)
+    {
+        $book = Book::findOrFail($id);
+        return view('books.show', compact('book'));
+    }
+
     public function create()
     {
         $genres = Genre::all();
         return view('books.create', compact('genres'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'genre_id' => 'required|exists:genres,id',
-            'published_year' => 'required|integer',
+        $request->validate([
+            'title' => 'required',
+            'genre_id' => 'required',
         ]);
 
-        $book = Book::create($validated);
+        Book::create($request->all());
 
-        Log::info('Book saved', [
-            'id' => $book->id,
-        ]);
-
-        return redirect()->route('books.index')->with('success', 'Book created successfully.');
+        return redirect()->route('books.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Book $book)
+    public function edit($id)
     {
-        return view('books.show', compact('book'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Book $book)
-    {
+        $book = Book::findOrFail($id);
         $genres = Genre::all();
         return view('books.edit', compact('book', 'genres'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'genre_id' => 'required|exists:genres,id',
-            'published_year' => 'required|integer',
-        ]);
+        $book = Book::findOrFail($id);
+        $book->update($request->all());
 
-        $book->update($validated);
-
-        return redirect()->route('books.index')->with('success', 'Book updated successfully.');
+        return redirect()->route('books.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Book $book)
+    public function destroy($id)
     {
-        // Idinagdag para sa Part E (Refuse a request kung iisa na lang ang natitirang record sa genre)
-        abort_if($book->genre->books()->count() === 1, 403);
-
+        $book = Book::findOrFail($id);
         $book->delete();
 
-        return redirect()->route('books.index')->with('success', 'Book deleted successfully.');
+        return redirect()->route('books.index');
     }
 }
