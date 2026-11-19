@@ -12,7 +12,7 @@
             <h1 class="display-4 fw-bold text-warning mb-2">Welcome to Library App</h1>
             <h3 class="fw-semibold text-light">Mj Obogne</h3>
             <p class="lead text-light mb-3">BSIT (Bachelor of Science in Information Technology)</p>
-            <p class="text-light opacity-75">Isang maganda at modernong web application para sa pamamahala ng mga aklat, genre, at mga aktibidad sa ating sistema.</p>
+            <p class="text-light opacity-75">A clean and modern web application for managing books, genres, and activities in our system.</p>
             <a href="{{ route('books.index') }}" class="btn btn-warning btn-lg fw-bold text-dark mt-2 shadow-sm">View Book List</a>
         </div>
     </div>

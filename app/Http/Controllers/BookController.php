@@ -12,12 +12,12 @@ class BookController extends Controller
     {
         $query = Book::with('genre');
 
-        // Optional: Kung may filter sa genre o search
+        // Optional: Filter by genre if provided
         if ($request->has('genre') && !empty($request->genre)) {
             $query->where('genre_id', $request->genre);
         }
 
-        // Pinalitan mula get() patungong paginate(5) para gumana ang pagination sa Pahina 1, 2, atbp.
+        // Paginate results to 5 items per page
         $books = $query->paginate(5);
 
         return view('books.index', compact('books'));
@@ -50,7 +50,8 @@ class BookController extends Controller
 
         Book::create($request->all());
 
-        return redirect()->route('books.index');
+        // Flash success message after creating a book
+        return redirect()->route('books.index')->with('success', 'Book created successfully.');
     }
 
     public function edit($id)
@@ -65,7 +66,8 @@ class BookController extends Controller
         $book = Book::findOrFail($id);
         $book->update($request->all());
 
-        return redirect()->route('books.index');
+        // Flash success message after updating a book
+        return redirect()->route('books.index')->with('success', 'Book updated successfully.');
     }
 
     public function destroy($id)
@@ -73,6 +75,7 @@ class BookController extends Controller
         $book = Book::findOrFail($id);
         $book->delete();
 
-        return redirect()->route('books.index');
+        // Flash success message after deleting a book
+        return redirect()->route('books.index')->with('success', 'Book deleted successfully.');
     }
 }
